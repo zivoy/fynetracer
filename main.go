@@ -25,24 +25,11 @@ var buffer *image.RGBA
 var raster *canvas.Raster
 
 func main() {
-	a := app.New()
-	w := a.NewWindow("Hello World")
+	a := app.NewWithID("RayTracerTestCherno")
+	w := a.NewWindow("Ray Tracer")
 
 	buffer = image.NewRGBA(image.Rectangle{Max: image.Point{X: width, Y: height}})
 
-	// go func() {
-	// 	sleepAmount := time.Second / 10
-	// 	for i := 0; i < 3000; i++ {
-	// 		setRandomPixel()
-	// 		if i%10 == 0 {
-	// 			raster.Refresh()
-	// 		}
-	// 		time.Sleep(sleepAmount)
-	// 	}
-	// }()
-
-	// rect := canvas.NewRectangle(color.White)
-	// rect.SetMinSize(fyne.NewSize(150, 100))
 	raster = canvas.NewRasterWithPixels(
 		func(x, y, w, h int) color.Color {
 			xC := x * width / w
@@ -50,18 +37,16 @@ func main() {
 			// use nfnt/resize
 			return buffer.At(xC, yC)
 		})
-	// raster = canvas.NewRasterFromImage(buffer)
 	raster.SetMinSize(fyne.NewSize(300, 300))
 
 	timeTook := widget.NewLabel("last render:")
 	timeTook.MinSize()
 
-	var startTime, endTime time.Time
 	timeRender := func() {
-		startTime = time.Now()
+		startTime := time.Now()
 		Render()
-		endTime = time.Now()
-		timeTook.SetText(fmt.Sprintf("last render: %s", endTime.Sub(startTime).String()))
+		eclipsed := time.Since(startTime)
+		timeTook.SetText(fmt.Sprintf("last render: %s", eclipsed))
 	}
 	action := widget.NewButton("Render", timeRender)
 	timer := time.NewTicker(time.Second / 30)
@@ -84,7 +69,6 @@ func main() {
 				}
 			}()
 		} else {
-			// timer.Stop()
 			close(stop)
 		}
 	})
@@ -125,7 +109,6 @@ func main() {
 	colPic.SetColor(sphereCol.RGBA())
 	panel := container.New(layout.NewVBoxLayout(), timeTook, widget.NewLabel("------------------------------------------"), action, autoRender, lightpos, colourPicker)
 
-	container := container.NewBorder(nil, nil, nil, panel, raster)
-	w.SetContent(container)
+	w.SetContent(container.NewBorder(nil, nil, nil, panel, raster))
 	w.ShowAndRun()
 }
