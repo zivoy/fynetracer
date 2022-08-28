@@ -27,7 +27,6 @@ func Render() {
 			yP = -yP + 1
 
 			yP = yP*2 - 1
-			//row := buffer[yLoc]
 			var xP float64
 			for x := 0; x < width; x++ {
 				xP = float64(x) * aspect / float64(width)
@@ -36,19 +35,14 @@ func Render() {
 
 				buffer.SetRGBA(x, yLoc, colour.RGBA())
 			}
-			//time.Sleep(time.Second / 120)
 		}(y)
 	}
 	wg.Wait()
 	raster.Refresh()
 }
 
-var rayDirection = &helpers.Vector3{}
-
 func calcPixel(x, y float64) helpers.Colour {
-	rayDirection.X = x
-	rayDirection.Y = y
-	rayDirection.Z = -1
+	rayDirection := helpers.NewVector3(x, y, -1)
 
 	a := rayDirection.Dot(rayDirection)
 	b := 2 * cameraPos.Dot(rayDirection)
